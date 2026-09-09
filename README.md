@@ -11,7 +11,7 @@ offline și se instalează pe telefon ca aplicație obișnuită.
 
 ## Deschide-o
 
-Pe GitHub Pages: `https://<utilizator>.github.io/<repo>/`
+**https://dantraistaru-maker.github.io/Alcoolmetru/**
 
 Pe telefon o poți pune pe ecranul principal, ca să o deschizi ca pe orice altă
 aplicație și să meargă fără internet:
