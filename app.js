@@ -138,8 +138,9 @@ const eInstalata = window.matchMedia("(display-mode: standalone)").matches
 const eIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
   || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-let cerereInstalare = null;
-let browserulSeOfera = false;   // a trimis vreodata beforeinstallprompt?
+/* Evenimentul e prins de scriptul din capul paginii, care ruleaza inaintea
+   acestui modul; aici doar il preluam, fie ca a venit deja, fie ca vine acum. */
+const asteptare = window.__instalare || { cerere: null, oferit: false };
 
 function arataInstalarea(html, cuButon) {
   textInstal.innerHTML = html;
@@ -147,22 +148,22 @@ function arataInstalarea(html, cuButon) {
   cardInstal.hidden = false;
 }
 
+function ofera() {
+  arataInstalarea(
+    "Pune aplicația pe ecranul principal, ca s-o deschizi ca pe oricare alta "
+    + "și să meargă fără internet.", true);
+}
+
 if (!eInstalata) {
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();               // ne ocupăm noi, din butonul de mai jos
-    cerereInstalare = e;
-    browserulSeOfera = true;
-    arataInstalarea(
-      "Pune aplicația pe ecranul principal, ca s-o deschizi ca pe oricare alta "
-      + "și să meargă fără internet.", true);
-  });
+  if (asteptare.oferit) ofera();
+  window.addEventListener("instalare-posibila", ofera);
 
   butonInstal.addEventListener("click", async () => {
-    if (!cerereInstalare) return;
+    if (!asteptare.cerere) return;
     butonInstal.disabled = true;
-    cerereInstalare.prompt();
-    const { outcome } = await cerereInstalare.userChoice;
-    cerereInstalare = null;
+    asteptare.cerere.prompt();
+    const { outcome } = await asteptare.cerere.userChoice;
+    asteptare.cerere = null;
     butonInstal.disabled = false;
     if (outcome === "accepted") cardInstal.hidden = true;
     else butonInstal.hidden = true;
@@ -176,7 +177,7 @@ if (!eInstalata) {
     // Dacă browserul nu s-a oferit să instaleze, cel mai probabil pagina e
     // deschisă într-un browser dintr-o altă aplicație, care nu are cum.
     setTimeout(() => {
-      if (!browserulSeOfera && cardInstal.hidden) {
+      if (!asteptare.oferit && cardInstal.hidden) {
         arataInstalarea(
           "Nu poți instala aplicația din acest browser. Deschide adresa în "
           + "<strong>Chrome</strong> — dacă ai ajuns aici dintr-un mesaj, apasă "
@@ -187,11 +188,15 @@ if (!eInstalata) {
 }
 
 window.addEventListener("appinstalled", () => {
-  browserulSeOfera = true;        // nu mai are rost niciun indemn
+  asteptare.oferit = true;        // nu mai are rost niciun indemn
   cardInstal.hidden = true;
 });
 
-/* Funcționare fără rețea. */
+/* Funcționare fără rețea. Versiunea e scrisă în subsol: cand ceva nu merge pe
+   telefon, primul lucru de aflat e ce versiune ruleaza acolo. */
+export const VERSIUNE_APP = "v3";
+el("versiune").textContent = "versiunea " + VERSIUNE_APP;
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").catch(() => {});

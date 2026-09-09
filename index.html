@@ -15,6 +15,20 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Alcoolmetru">
 <link rel="stylesheet" href="styles.css">
+<script>
+  /* Chrome anunta ca aplicatia se poate instala imediat ce a verificat manifestul
+     si service worker-ul - uneori inainte ca modulul app.js sa apuce sa ruleze,
+     fiindca modulele sunt amanate. Daca prindem evenimentul abia acolo, il
+     pierdem si butonul nu mai apare niciodata. De aceea il prindem aici, in
+     capul paginii, si il lasam sa astepte. */
+  window.__instalare = { cerere: null, oferit: false };
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    window.__instalare.cerere = e;
+    window.__instalare.oferit = true;
+    window.dispatchEvent(new Event("instalare-posibila"));
+  });
+</script>
 </head>
 <body>
 <main class="wrap">
@@ -92,6 +106,7 @@
     <p>Date din tabelul de corecție al termo-alcoolmetrului 0–100 % vol,
       etalonat la 20 °C.</p>
     <p id="stare-offline" class="offline"></p>
+    <p id="versiune"></p>
   </footer>
 
 </main>
