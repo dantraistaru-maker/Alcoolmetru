@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Corecție alcoolmetru</title>
+<meta name="description" content="Corectează tăria alcoolică citită pe alcoolmetru în funcție de temperatura distilatului, raportat la 20 °C.">
+<meta name="theme-color" content="#141d27">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-64.png" sizes="64x64">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alcoolmetru">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="wrap">
+
+  <header class="cap">
+    <img class="marca" src="icons/icon-192.png" alt="" width="44" height="44">
+    <div>
+      <h1>Corecție alcoolmetru</h1>
+      <p class="sub">Tăria reală la 20 °C</p>
+    </div>
+  </header>
+
+  <section class="card" aria-labelledby="intrari">
+    <h2 id="intrari" class="sr-only">Date măsurate</h2>
+
+    <div class="camp">
+      <label for="temp">Temperatura distilatului</label>
+      <div class="rand">
+        <button class="pas" type="button" data-tinta="temp" data-delta="-1" aria-label="Scade temperatura">−</button>
+        <input id="temp" type="text" inputmode="decimal" data-min="0" data-max="30"
+               value="20" autocomplete="off" enterkeyhint="done">
+        <span class="um">°C</span>
+        <button class="pas" type="button" data-tinta="temp" data-delta="1" aria-label="Crește temperatura">+</button>
+      </div>
+      <input class="glisor" type="range" id="temp-glisor" min="0" max="30" step="0.5"
+             value="20" aria-label="Temperatura, reglaj rapid">
+    </div>
+
+    <div class="camp">
+      <label for="citit">Tăria citită pe tijă</label>
+      <div class="rand">
+        <button class="pas" type="button" data-tinta="citit" data-delta="-0.5" aria-label="Scade tăria citită">−</button>
+        <input id="citit" type="text" inputmode="decimal" data-min="5" data-max="84"
+               value="40" autocomplete="off" enterkeyhint="done">
+        <span class="um">% vol</span>
+        <button class="pas" type="button" data-tinta="citit" data-delta="0.5" aria-label="Crește tăria citită">+</button>
+      </div>
+      <input class="glisor" type="range" id="citit-glisor" min="5" max="84" step="0.5"
+             value="40" aria-label="Tăria citită, reglaj rapid">
+    </div>
+  </section>
+
+  <section class="card rezultat" aria-live="polite">
+    <p class="eticheta">Tăria reală la 20 °C</p>
+    <p class="valoare"><output id="iesire">—</output><span class="unit">% vol</span></p>
+    <p class="delta" id="delta"></p>
+    <p class="avert" id="avert" hidden></p>
+  </section>
+
+  <details class="card info">
+    <summary>Cum se folosește și ce precizie are</summary>
+    <div class="continut">
+      <p>Se pune distilatul într-un vas transparent, suficient de înalt cât
+        alcoolmetrul să plutească liber, fără să atingă pereții sau fundul.
+        Se citește gradația <strong>la baza meniscului</strong> și se notează
+        temperatura indicată de termometru. Cele două valori se introduc mai sus.</p>
+      <p>Tabelul acoperă <strong>5–84 % vol</strong> și <strong>0–30 °C</strong>.
+        Între punctele lui, valoarea se interpolează liniar.</p>
+      <p><strong>Sub 10 °C</strong> valorile nu provin din tabelul tipărit: sunt
+        prelungirea calculată a tendinței lui. Abaterea estimată e sub 0,1 % vol
+        până pe la 5 °C și ajunge la ~0,2 % vol la 0 °C, mai mare la capetele de
+        concentrație. Aplicația te avertizează când intri în zona aceea.</p>
+      <p>Rezultatul are valoare orientativă. Pentru declarații fiscale sau
+        verificări metrologice folosește tabelul oficial și un instrument
+        verificat.</p>
+    </div>
+  </details>
+
+  <footer class="subsol">
+    <p>Date din tabelul de corecție al termo-alcoolmetrului 0–100 % vol,
+      etalonat la 20 °C.</p>
+    <p id="stare-offline" class="offline"></p>
+  </footer>
+
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

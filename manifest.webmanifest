@@ -1,0 +1,19 @@
+{
+  "name": "Corecție alcoolmetru",
+  "short_name": "Alcoolmetru",
+  "description": "Corectează tăria alcoolică citită pe alcoolmetru în funcție de temperatura distilatului, raportat la 20 °C.",
+  "lang": "ro",
+  "dir": "ltr",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#141d27",
+  "theme_color": "#141d27",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
