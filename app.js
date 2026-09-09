@@ -120,6 +120,77 @@ function reia() {
 reia();
 calculeaza();
 
+/* --------------------------------------------- instalarea pe ecranul principal
+
+Meniul browserului ascunde comanda de instalare în locuri diferite de la o
+versiune la alta, așa că o aducem în pagină. Android trimite evenimentul
+`beforeinstallprompt` și atunci putem deschide dialogul direct dintr-un buton;
+iOS nu-l trimite deloc, acolo rămân doar instrucțiunile. Iar browserele din
+interiorul altor aplicații (WhatsApp, Facebook) nu pot instala nimic - pentru
+ele spunem ce e de făcut. */
+
+const cardInstal = el("instalare");
+const textInstal = el("instalare-text");
+const butonInstal = el("instalare-buton");
+
+const eInstalata = window.matchMedia("(display-mode: standalone)").matches
+  || window.navigator.standalone === true;
+const eIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+  || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+let cerereInstalare = null;
+let browserulSeOfera = false;   // a trimis vreodata beforeinstallprompt?
+
+function arataInstalarea(html, cuButon) {
+  textInstal.innerHTML = html;
+  butonInstal.hidden = !cuButon;
+  cardInstal.hidden = false;
+}
+
+if (!eInstalata) {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();               // ne ocupăm noi, din butonul de mai jos
+    cerereInstalare = e;
+    browserulSeOfera = true;
+    arataInstalarea(
+      "Pune aplicația pe ecranul principal, ca s-o deschizi ca pe oricare alta "
+      + "și să meargă fără internet.", true);
+  });
+
+  butonInstal.addEventListener("click", async () => {
+    if (!cerereInstalare) return;
+    butonInstal.disabled = true;
+    cerereInstalare.prompt();
+    const { outcome } = await cerereInstalare.userChoice;
+    cerereInstalare = null;
+    butonInstal.disabled = false;
+    if (outcome === "accepted") cardInstal.hidden = true;
+    else butonInstal.hidden = true;
+  });
+
+  if (eIOS) {
+    arataInstalarea(
+      "Ca s-o pui pe ecranul principal: apasă butonul <strong>Partajare</strong> "
+      + "din bara de jos, apoi <strong>Adaugă la ecranul principal</strong>.", false);
+  } else {
+    // Dacă browserul nu s-a oferit să instaleze, cel mai probabil pagina e
+    // deschisă într-un browser dintr-o altă aplicație, care nu are cum.
+    setTimeout(() => {
+      if (!browserulSeOfera && cardInstal.hidden) {
+        arataInstalarea(
+          "Nu poți instala aplicația din acest browser. Deschide adresa în "
+          + "<strong>Chrome</strong> — dacă ai ajuns aici dintr-un mesaj, apasă "
+          + "meniul ⋮ și alege <em>Deschide în Chrome</em>.", false);
+      }
+    }, 2500);
+  }
+}
+
+window.addEventListener("appinstalled", () => {
+  browserulSeOfera = true;        // nu mai are rost niciun indemn
+  cardInstal.hidden = true;
+});
+
 /* Funcționare fără rețea. */
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

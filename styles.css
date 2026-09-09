@@ -30,6 +30,9 @@
 
 * { box-sizing: border-box; }
 
+/* `display` din regulile de mai jos ar invinge altfel atributul hidden */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   background: var(--fundal);
@@ -175,3 +178,28 @@ h1 { margin: 0; font-size: 1.3rem; letter-spacing: -.01em; }
 .subsol { color: var(--slab); font-size: .75rem; text-align: center; }
 .subsol p { margin: .25rem 0; }
 .offline:not(:empty) { color: var(--accent); }
+
+/* ------------------------------------------------------------- instalare */
+.instalare {
+  background: var(--accent-slab);
+  border-color: var(--accent);
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  align-items: flex-start;
+}
+.instalare p { margin: 0; font-size: .875rem; }
+.buton {
+  width: 100%;
+  min-height: 2.875rem;
+  padding: .625rem 1.25rem;
+  font: 600 1rem inherit;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.buton:active { transform: scale(.98); }
+.buton:disabled { opacity: .6; }
