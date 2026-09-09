@@ -25,6 +25,7 @@ export function corecteaza(temp, citit) {
 /* ------------------------------------------------------------- interfața */
 
 const el = (id) => document.getElementById(id);
+export const VERSIUNE_APP = "v4";
 const temp = el("temp"), citit = el("citit");
 const tempGlisor = el("temp-glisor"), cititGlisor = el("citit-glisor");
 const iesire = el("iesire"), delta = el("delta"), avert = el("avert");
@@ -132,6 +133,8 @@ ele spunem ce e de făcut. */
 const cardInstal = el("instalare");
 const textInstal = el("instalare-text");
 const butonInstal = el("instalare-buton");
+const butonDetalii = el("detalii-buton");
+const detalii = el("detalii");
 
 const eInstalata = window.matchMedia("(display-mode: standalone)").matches
   || window.navigator.standalone === true;
@@ -174,28 +177,60 @@ if (!eInstalata) {
       "Ca s-o pui pe ecranul principal: apasă butonul <strong>Partajare</strong> "
       + "din bara de jos, apoi <strong>Adaugă la ecranul principal</strong>.", false);
   } else {
-    // Dacă browserul nu s-a oferit să instaleze, cel mai probabil pagina e
-    // deschisă într-un browser dintr-o altă aplicație, care nu are cum.
-    setTimeout(() => {
-      if (!asteptare.oferit && cardInstal.hidden) {
-        arataInstalarea(
-          "Nu poți instala aplicația din acest browser. Deschide adresa în "
-          + "<strong>Chrome</strong> — dacă ai ajuns aici dintr-un mesaj, apasă "
-          + "meniul ⋮ și alege <em>Deschide în Chrome</em>.", false);
-      }
-    }, 2500);
+    setTimeout(explicaTacerea, 2500);
   }
 }
+
+/** Browserul nu s-a oferit să instaleze. Aflăm de ce, în loc să ghicim.
+
+    Cel mai des aplicația e deja instalată: atunci Chrome nu mai trimite
+    evenimentul. Întrebăm chiar browserul, prin getInstalledRelatedApps() -
+    răspunde despre aplicația noastră fiindcă e trecută în manifest. */
+async function explicaTacerea() {
+  if (asteptare.oferit || !cardInstal.hidden) return;
+  let instalata = false;
+  try {
+    const gasite = await navigator.getInstalledRelatedApps?.();
+    instalata = Array.isArray(gasite) && gasite.length > 0;
+  } catch { /* browserul nu cunoaște funcția */ }
+
+  arataInstalarea(instalata
+    ? "Aplicația este <strong>deja instalată</strong> pe telefon. Caut-o printre "
+      + "aplicații după iconul cu paharul și termometrul, sau pe ecranul principal."
+    : "Browserul nu s-a oferit să instaleze aplicația. Încearcă din meniul "
+      + "<strong>⋮</strong> al browserului: <em>Instalează aplicația</em> sau "
+      + "<em>Adaugă la ecranul de pornire</em>.", false);
+  butonDetalii.hidden = false;
+  butonDetalii.dataset.instalata = String(instalata);
+}
+
+butonDetalii.addEventListener("click", async () => {
+  if (!detalii.hidden) { detalii.hidden = true; return; }
+  const reg = await navigator.serviceWorker?.getRegistration().catch(() => null);
+  const man = document.querySelector('link[rel="manifest"]');
+  let manOk = "?";
+  try { manOk = (await fetch(man.href)).ok ? "găsit" : "lipsă"; } catch { manOk = "lipsă"; }
+  detalii.textContent = [
+    `versiune app:  ${VERSIUNE_APP}`,
+    `deja instalată: ${butonDetalii.dataset.instalata}`,
+    `service worker: ${reg ? (reg.active ? "activ" : "în curs") : "lipsă"}`,
+    `manifest:       ${manOk}`,
+    `mod afișare:    ${eInstalata ? "aplicație" : "filă de browser"}`,
+    `protocol:       ${location.protocol}`,
+    `browser:        ${navigator.userAgent}`,
+  ].join("\n");
+  detalii.hidden = false;
+});
 
 window.addEventListener("appinstalled", () => {
   asteptare.oferit = true;        // nu mai are rost niciun indemn
   cardInstal.hidden = true;
 });
 
+el("versiune").textContent = "versiunea " + VERSIUNE_APP;
+
 /* Funcționare fără rețea. Versiunea e scrisă în subsol: cand ceva nu merge pe
    telefon, primul lucru de aflat e ce versiune ruleaza acolo. */
-export const VERSIUNE_APP = "v3";
-el("versiune").textContent = "versiunea " + VERSIUNE_APP;
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

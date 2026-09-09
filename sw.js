@@ -1,6 +1,6 @@
 // Cache simplu: aplicatia e statica si mica, deci o tinem intreaga offline.
 // Schimba VERSIUNE la fiecare actualizare, ca telefoanele sa ia fisierele noi.
-const VERSIUNE = "alcoolmetru-v3";
+const VERSIUNE = "alcoolmetru-v4";
 const FISIERE = [
   "./", "./index.html", "./styles.css", "./app.js", "./date.js",
   "./manifest.webmanifest",
